@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
   id("org.springframework.boot") version "2.1.6.RELEASE"
@@ -11,6 +12,9 @@ group = "com.feigntest"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 java.targetCompatibility = JavaVersion.VERSION_1_8
+
+val bootJar: BootJar by tasks
+bootJar.enabled = false
 
 allprojects {
   repositories {
