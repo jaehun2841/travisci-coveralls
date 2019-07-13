@@ -4,6 +4,7 @@ val jar: Jar by tasks
 val bootJar: BootJar by tasks
 
 bootJar.enabled = true
+bootJar.mainClassName = "com.feigntest.demo.DemoClientApplication"
 jar.enabled = true
 
 dependencies {
