@@ -7,6 +7,7 @@ plugins {
   kotlin("jvm") version "1.2.71"
   kotlin("plugin.spring") version "1.2.71"
   jacoco
+  id("com.github.kt3k.coveralls") version "2.8.2"
 }
 
 group = "com.feigntest"
