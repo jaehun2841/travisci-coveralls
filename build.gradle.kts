@@ -6,6 +6,7 @@ plugins {
   id("io.spring.dependency-management") version "1.0.7.RELEASE"
   kotlin("jvm") version "1.2.71"
   kotlin("plugin.spring") version "1.2.71"
+  jacoco
 }
 
 group = "com.feigntest"
@@ -20,6 +21,13 @@ allprojects {
   repositories {
     mavenCentral()
   }
+
+  tasks.withType<JacocoReport> {
+    reports {
+      xml.isEnabled = true
+      html.isEnabled = true
+    }
+  }
 }
 
 subprojects {
@@ -29,6 +37,16 @@ subprojects {
   apply(plugin = "org.springframework.boot")
   apply(plugin = "io.spring.dependency-management")
   apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+
+  buildscript {
+    repositories {
+      mavenCentral()
+    }
+
+    dependencies {
+      classpath("org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2")
+    }
+  }
 
   dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -43,6 +61,7 @@ subprojects {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("io.projectreactor:reactor-test")
   }
+
 
   extra["springCloudVersion"] = "Greenwich.SR1"
 
