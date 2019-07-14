@@ -9,9 +9,9 @@ import reactor.core.publisher.Mono
 @ReactiveFeignClient(name="demoClient", url = "\${demo.url}")
 interface DemoClient {
 
-  @GetMapping(value = "/demo/one")
+  @GetMapping(value = ["/demo/one"])
   fun getOne(@SpringQueryMap params: MutableMap<String, Any>): Mono<DemoData>
 
-  @GetMapping(value = "/demo/list")
+  @GetMapping(value = ["/demo/list"])
   fun getList(): Mono<List<DemoData>>
 }

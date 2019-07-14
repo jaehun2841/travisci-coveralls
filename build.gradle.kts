@@ -78,10 +78,6 @@ subprojects {
   }
 
   // setting for coveralls
-  tasks.withType<Test> {
-    useJUnitPlatform()
-  }
-
   val jacocoTestReport: JacocoReport by tasks
   jacocoTestReport.reports {
     html.isEnabled = true // human readable
