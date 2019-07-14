@@ -21,3 +21,5 @@ before_install:
   - chmod +x gradle/wrapper/gradle-wrapper.jar
 script:
   - ./gradlew clean build
+after_success:
+  - ./gradlew jacocoRootReport coveralls

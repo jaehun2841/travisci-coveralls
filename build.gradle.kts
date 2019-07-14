@@ -18,17 +18,25 @@ java.targetCompatibility = JavaVersion.VERSION_1_8
 val bootJar: BootJar by tasks
 bootJar.enabled = false
 
-allprojects {
+buildscript {
   repositories {
     mavenCentral()
   }
 
-  tasks.withType<JacocoReport> {
-    reports {
-      xml.isEnabled = true
-      html.isEnabled = true
-    }
+  dependencies {
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.50")
+    classpath("org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2")
   }
+}
+
+allprojects {
+  repositories {
+    mavenCentral()
+    jcenter()
+  }
+
+  apply(plugin = "com.github.kt3k.coveralls")
+  apply(plugin = "jacoco")
 }
 
 subprojects {
@@ -38,16 +46,6 @@ subprojects {
   apply(plugin = "org.springframework.boot")
   apply(plugin = "io.spring.dependency-management")
   apply(plugin = "org.jetbrains.kotlin.plugin.spring")
-
-  buildscript {
-    repositories {
-      mavenCentral()
-    }
-
-    dependencies {
-      classpath("org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.2")
-    }
-  }
 
   dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -78,4 +76,48 @@ subprojects {
       jvmTarget = "1.8"
     }
   }
+
+  // setting for coveralls
+  tasks.withType<Test> {
+    useJUnitPlatform()
+  }
+
+  val jacocoTestReport: JacocoReport by tasks
+  jacocoTestReport.reports {
+    html.isEnabled = true // human readable
+    xml.isEnabled = true // required by coveralls
+  }
+}
+
+val jacocoRootReport by tasks.creating(JacocoReport::class) {
+  description = "Generates an aggregate report from all subprojects"
+
+  val sourceDirectoriesPaths = ArrayList<Any>()
+  val classDirectoriesPaths = ArrayList<Any>()
+  val executionDataPaths = ArrayList<Any>()
+
+  for (project in subprojects) {
+    dependsOn(project.tasks.test)
+    sourceDirectoriesPaths.add(project.sourceSets.main.get().allSource.srcDirs)
+    classDirectoriesPaths.add(project.sourceSets.main.get().output)
+    executionDataPaths.add(project.tasks.jacocoTestReport.get().executionData)
+  }
+  val sourceDirectories = files(*sourceDirectoriesPaths.toArray())
+  val classDirectories = files(*classDirectoriesPaths.toArray())
+  val executionData = files(*executionDataPaths.toArray())
+
+  reports {
+    html.isEnabled = true // human readable
+    xml.isEnabled = true // required by coveralls
+  }
+}
+
+coveralls {
+
+  val sourceDirectoriesPaths = ArrayList<Set<File>>()
+  for (project in subprojects) {
+    sourceDirectoriesPaths.add(project.sourceSets.main.get().allSource.srcDirs)
+  }
+  sourceDirs = sourceDirectoriesPaths.flatMap { files -> files.map { it.absolutePath } }
+  jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/jacocoRootReport.xml"
 }
